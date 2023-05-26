@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.postgresql.PGEnvironment;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -36,7 +33,8 @@ public class CustomDataSource implements DataSource {
     public static CustomDataSource getInstance() {
         if (instance == null) {
             try {
-                FileInputStream fis = new FileInputStream("C:\\Users\\1\\Desktop\\MJC School\\2_Stage\\stage2-module6-jdbc-assignments\\src\\main\\resources\\app.properties");
+                File propsFile = new File("src\\main\\resources\\app.properties");
+                FileInputStream fis = new FileInputStream(propsFile.getAbsolutePath());
                 Properties props = new Properties();
                 props.load(fis);
 
