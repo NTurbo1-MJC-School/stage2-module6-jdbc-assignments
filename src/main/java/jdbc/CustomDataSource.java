@@ -33,7 +33,8 @@ public class CustomDataSource implements DataSource {
     public static CustomDataSource getInstance() {
         if (instance == null) {
             try {
-                File propsFile = new File("src\\main\\resources\\app.properties");
+                File propsFile = new File("src/main/resources/app.properties");
+                System.out.println(propsFile.getAbsolutePath());
                 FileInputStream fis = new FileInputStream(propsFile.getAbsolutePath());
                 Properties props = new Properties();
                 props.load(fis);
