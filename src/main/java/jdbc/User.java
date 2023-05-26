@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 @Getter
 @Setter
 @AllArgsConstructor
