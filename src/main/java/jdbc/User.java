@@ -21,18 +21,4 @@ public class User {
     private String firstName;
     private String lastName;
     private int age;
-
-    public static void main(String[] args) {
-        try {
-            Connection conn = CustomDataSource.getInstance().getConnection();
-
-            if (conn == null) {
-                System.out.println("FAIL");
-            } else {
-                System.out.println("SUCCESS");
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
 }
