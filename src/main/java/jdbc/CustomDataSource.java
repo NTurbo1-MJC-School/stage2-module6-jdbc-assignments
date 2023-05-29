@@ -32,10 +32,9 @@ public class CustomDataSource implements DataSource {
 
     public static CustomDataSource getInstance() {
         if (instance == null) {
-            try {
-                File propsFile = new File("src/main/resources/app.properties");
-                System.out.println(propsFile.getAbsolutePath());
-                FileInputStream fis = new FileInputStream(propsFile.getAbsolutePath());
+            File propsFile = new File("src/main/resources/app.properties");
+
+            try (FileInputStream fis = new FileInputStream(propsFile.getAbsolutePath())) {
                 Properties props = new Properties();
                 props.load(fis);
 
@@ -44,9 +43,13 @@ public class CustomDataSource implements DataSource {
                 String password = props.getProperty("postgres.password");
                 String name = props.getProperty("postgres.name");
 
+                System.out.println("driver: " + driver);
+                System.out.println("url: " + url);
+                System.out.println("name: " + name);
+                System.out.println("password: " + password);
+
                 instance = new CustomDataSource(driver, url, password, name);
 
-                fis.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -61,41 +64,41 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        return null;
+        return DriverManager.getConnection(this.url, username, password);
     }
 
     @Override
     public PrintWriter getLogWriter() throws SQLException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setLogWriter(PrintWriter out) throws SQLException {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void setLoginTimeout(int seconds) throws SQLException {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public int getLoginTimeout() throws SQLException {
-        return 0;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return false;
+        throw new UnsupportedOperationException();
     }
 }
