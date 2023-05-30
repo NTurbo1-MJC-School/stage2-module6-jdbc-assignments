@@ -4,11 +4,9 @@ import javax.sql.DataSource;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.postgresql.PGEnvironment;
 
 import java.io.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
@@ -60,12 +58,12 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new CustomConnector().getConnection(this.url, this.name, this.password);
+        return new CustomConnector().getConnection(url, name, password);
     }
 
     @Override
     public Connection getConnection(String username, String password) {
-        return new CustomConnector().getConnection(this.url, username, password);
+        return new CustomConnector().getConnection(url, username, password);
     }
 
     @Override

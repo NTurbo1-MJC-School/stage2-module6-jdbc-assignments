@@ -15,7 +15,16 @@ import java.util.List;
 @NoArgsConstructor
 public class SimpleJDBCRepository {
 
-    private Connection connection = null;
+    private Connection connection;
+
+    {
+        try {
+            connection = CustomDataSource.getInstance().getConnection();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private PreparedStatement ps = null;
     private Statement st = null;
 
@@ -42,12 +51,12 @@ public class SimpleJDBCRepository {
             ps.execute();
             ps.close();
 
+            return this.findUserById(user.getId()).getId();
+
         } catch(SQLException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
-
-        return this.findUserById(user.getId()).getId();
     }
 
     public User findUserById(Long userId) {
@@ -82,7 +91,7 @@ public class SimpleJDBCRepository {
 
     public User findUserByName(String userName) {
 
-        User user = null;
+        User user = new User();
 
         try {
             if (this.connection == null) {
@@ -99,17 +108,20 @@ public class SimpleJDBCRepository {
                 String lastname = rs.getString("lastname");
                 int age = rs.getInt("age");
 
-                user = new User(id, firstname, lastname, age);
+                user.setId(id);
+                user.setFirstName(firstname);
+                user.setLastName(lastname);
+                user.setAge(age);
             }
 
             ps.close();
             rs.close();
+
+            return user;
         } catch(SQLException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
-
-        return user;
     }
 
     public List<User> findAllUser() {
