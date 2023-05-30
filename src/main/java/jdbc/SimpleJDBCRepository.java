@@ -33,22 +33,21 @@ public class SimpleJDBCRepository {
                 this.connection = CustomDataSource.getInstance().getConnection();
             }
 
-            this.ps = this.connection.prepareStatement(createUserSQL);
-            this.ps.setLong(1, user.getId());
-            this.ps.setString(2, user.getFirstName());
-            this.ps.setString(3, user.getLastName());
-            this.ps.setInt(4, user.getAge());
+            PreparedStatement ps = this.connection.prepareStatement(createUserSQL);
+            ps.setLong(1, user.getId());
+            ps.setString(2, user.getFirstName());
+            ps.setString(3, user.getLastName());
+            ps.setInt(4, user.getAge());
 
-            this.ps.execute();
-
-            User u = this.findUserById(user.getId());
-
-            return u.getId();
+            ps.execute();
+            ps.close();
 
         } catch(SQLException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
+
+        return this.findUserById(user.getId()).getId();
     }
 
     public User findUserById(Long userId) {
@@ -58,9 +57,9 @@ public class SimpleJDBCRepository {
                 this.connection = CustomDataSource.getInstance().getConnection();
             }
 
-            this.ps = this.connection.prepareStatement(findUserByIdSQL);
-            this.ps.setLong(1, userId);
-            ResultSet rs = this.ps.executeQuery();
+            PreparedStatement ps = this.connection.prepareStatement(findUserByIdSQL);
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
                 Long id = rs.getLong("id");
@@ -70,6 +69,9 @@ public class SimpleJDBCRepository {
 
                 user = new User(id, firstname, lastname, age);
             }
+
+            ps.close();
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -87,10 +89,10 @@ public class SimpleJDBCRepository {
                 this.connection = CustomDataSource.getInstance().getConnection();
             }
 
-            this.ps = this.connection.prepareStatement(findUserByNameSQL);
-            this.ps.setString(1, userName);
+            PreparedStatement ps = this.connection.prepareStatement(findUserByNameSQL);
+            ps.setString(1, userName);
 
-            ResultSet rs = this.ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 Long id = rs.getLong("id");
                 String firstname = rs.getString("firstname");
@@ -99,6 +101,9 @@ public class SimpleJDBCRepository {
 
                 user = new User(id, firstname, lastname, age);
             }
+
+            ps.close();
+            rs.close();
         } catch(SQLException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -115,8 +120,8 @@ public class SimpleJDBCRepository {
                 this.connection = CustomDataSource.getInstance().getConnection();
             }
 
-            this.ps = this.connection.prepareStatement(findAllUserSQL);
-            ResultSet rs = this.ps.executeQuery();
+            PreparedStatement ps = this.connection.prepareStatement(findAllUserSQL);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 Long id = rs.getLong("id");
                 String firstname = rs.getString("firstname");
@@ -127,6 +132,9 @@ public class SimpleJDBCRepository {
 
                 users.add(user);
             }
+
+            ps.close();
+            rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException();
@@ -141,13 +149,14 @@ public class SimpleJDBCRepository {
                 this.connection = CustomDataSource.getInstance().getConnection();
             }
 
-            this.ps = this.connection.prepareStatement(updateUserSQL);
+            PreparedStatement ps = this.connection.prepareStatement(updateUserSQL);
             ps.setString(1, user.getFirstName());
             ps.setString(2, user.getLastName());
             ps.setInt(3, user.getAge());
             ps.setLong(4, user.getId());
 
             ps.execute();
+            ps.close();
 
             return this.findUserById(user.getId());
         } catch (SQLException e) {
@@ -162,9 +171,10 @@ public class SimpleJDBCRepository {
                 this.connection = CustomDataSource.getInstance().getConnection();
             }
 
-            this.ps = this.connection.prepareStatement(deleteUser);
-            this.ps.setLong(1, userId);
-            this.ps.execute();
+            PreparedStatement ps = this.connection.prepareStatement(deleteUser);
+            ps.setLong(1, userId);
+            ps.execute();
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
             throw new RuntimeException();

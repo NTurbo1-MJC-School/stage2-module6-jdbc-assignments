@@ -24,6 +24,12 @@ public class CustomDataSource implements DataSource {
     private final String password;
 
     private CustomDataSource(String driver, String url, String password, String name) {
+        try {
+            Class.forName(driver);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         this.driver = driver;
         this.url = url;
         this.name = name;
@@ -32,35 +38,34 @@ public class CustomDataSource implements DataSource {
 
     public static CustomDataSource getInstance() {
         if (instance == null) {
+            Properties props = new Properties();
+            ClassLoader loader = Thread.currentThread().getContextClassLoader();
+            InputStream stream = loader.getResourceAsStream("app.properties");
 
             try {
-                Properties props = new Properties();
-                ClassLoader loader = Thread.currentThread().getContextClassLoader();
-                InputStream stream = loader.getResourceAsStream("app.properties");
                 props.load(stream);
-
-                String driver = props.getProperty("postgres.driver");
-                String url = props.getProperty("postgres.url");
-                String password = props.getProperty("postgres.password");
-                String name = props.getProperty("postgres.name");
-
-                instance = new CustomDataSource(driver, url, password, name);
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
+            String driver = props.getProperty("postgres.driver");
+            String url = props.getProperty("postgres.url");
+            String password = props.getProperty("postgres.password");
+            String name = props.getProperty("postgres.name");
+
+            instance = new CustomDataSource(driver, url, password, name);
         }
         return instance;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(this.url, this.name, this.password);
+        return new CustomConnector().getConnection(this.url, this.name, this.password);
     }
 
     @Override
-    public Connection getConnection(String username, String password) throws SQLException {
-        return DriverManager.getConnection(this.url, username, password);
+    public Connection getConnection(String username, String password) {
+        return new CustomConnector().getConnection(this.url, username, password);
     }
 
     @Override

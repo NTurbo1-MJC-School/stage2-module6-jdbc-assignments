@@ -22,12 +22,6 @@ public class CustomConnector {
 
         try {
             conn = DriverManager.getConnection(url, user, password);
-
-            if (conn == null) {
-                System.out.println("Connection Failed :(");
-            } else {
-                System.out.println("Connection Success :)");
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
