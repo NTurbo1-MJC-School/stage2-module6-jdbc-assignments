@@ -55,22 +55,11 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public Connection getConnection() throws SQLException {
-        try {
-            Class.forName(this.driver);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         return DriverManager.getConnection(this.url, this.name, this.password);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
-        try {
-            Class.forName(this.driver);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
         return DriverManager.getConnection(this.url, username, password);
     }
 
