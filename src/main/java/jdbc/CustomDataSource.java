@@ -32,21 +32,17 @@ public class CustomDataSource implements DataSource {
 
     public static CustomDataSource getInstance() {
         if (instance == null) {
-            File propsFile = new File("src/main/resources/app.properties");
 
-            try (FileInputStream fis = new FileInputStream(propsFile.getAbsolutePath())) {
+            try {
                 Properties props = new Properties();
-                props.load(fis);
+                ClassLoader loader = Thread.currentThread().getContextClassLoader();
+                InputStream stream = loader.getResourceAsStream("app.properties");
+                props.load(stream);
 
                 String driver = props.getProperty("postgres.driver");
                 String url = props.getProperty("postgres.url");
                 String password = props.getProperty("postgres.password");
                 String name = props.getProperty("postgres.name");
-
-                System.out.println("driver: " + driver);
-                System.out.println("url: " + url);
-                System.out.println("name: " + name);
-                System.out.println("password: " + password);
 
                 instance = new CustomDataSource(driver, url, password, name);
 
