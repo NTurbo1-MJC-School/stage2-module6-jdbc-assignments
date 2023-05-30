@@ -5,7 +5,9 @@ import javax.sql.DataSource;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -35,35 +37,34 @@ public class CustomDataSource implements DataSource {
     }
 
     public static CustomDataSource getInstance() {
+
         if (instance == null) {
             Properties props = new Properties();
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             InputStream stream = loader.getResourceAsStream("app.properties");
-
             try {
                 props.load(stream);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-            String driver = props.getProperty("postgres.driver");
-            String url = props.getProperty("postgres.url");
-            String password = props.getProperty("postgres.password");
-            String name = props.getProperty("postgres.name");
-
-            instance = new CustomDataSource(driver, url, password, name);
+            instance = new CustomDataSource(
+                    props.getProperty("postgres.driver"),
+                    props.getProperty("postgres.url"),
+                    props.getProperty("postgres.password"),
+                    props.getProperty("postgres.name"));
         }
         return instance;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        return new CustomConnector().getConnection(url, name, password);
+        CustomConnector connector = new CustomConnector();
+        return connector.getConnection(url, name, password);
     }
 
     @Override
-    public Connection getConnection(String username, String password) {
-        return new CustomConnector().getConnection(url, username, password);
+    public Connection getConnection(String username, String password) throws SQLException {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -98,6 +99,6 @@ public class CustomDataSource implements DataSource {
 
     @Override
     public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        throw new UnsupportedOperationException();
+        return false;
     }
 }
